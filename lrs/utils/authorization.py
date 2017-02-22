@@ -109,16 +109,45 @@ def get_user_from_auth(auth):
     else:
         # it's a group.. gotta find out which of the 2 members is the client
         for member in auth.member.all():
+            # print "member.name   %s " % member.name
+            # print "member.account_name   %s " % member.account_name
+            # print "member.mbox   %s " % member.mbox
+            # print "member.objectType   %s " % member.objectType
+            # print '-----------------------------------------'
+            # member is Agent object.
+            # if member.name:
+            #    username = member.name
+
             if member.account_name:
                 key = member.account_name
                 break
-        user = Consumer.objects.get(key__exact=key).user
+
+	uname = ''
+        for member in auth.member.all():
+	    if member.name:
+	        uname = member.name
+
+        client_app = Consumer.objects.get(key__exact=key)
+        users = client_app.users.all()
+        user = users[0]
+        for u in users:
+            if u.username == uname:
+                user = u
+
+        # print users
+        # print 'selected user = %s' % user.username
     return user
 
 
 def validate_oauth_scope(req_dict):
     method = req_dict['method']
     endpoint = req_dict['auth']['endpoint']
+    broken_endpoint = endpoint.split('/')
+    # Note: Bug fix - When client app accesses to statement/more/<more_id>
+    if len(broken_endpoint) == 4 and broken_endpoint[2] == 'more':
+        del broken_endpoint[-1]
+        endpoint = '/'.join(broken_endpoint)
+
     token = req_dict['auth']['oauth_token']
     scopes = token.scope_to_list()
 
@@ -223,6 +252,11 @@ def http_auth_helper(request):
 def oauth_helper(request):
     token = request['auth']['oauth_token']
     user = token.user
+    # print 'token === '
+    # print token
+    # print 'user === '
+    # print user.id
+
     user_name = user.username
     if user.email.startswith('mailto:'):
         user_email = user.email
@@ -248,6 +282,7 @@ def oauth_helper(request):
     ]
     kwargs = {"objectType": "Group", "member": members,
               "oauth_identifier": "anongroup:%s-%s" % (consumer.key, user_email)}
+
     # create/get oauth group and set in dictionary
     oauth_group, created = Agent.objects.oauth_group(**kwargs)
     request['auth']['agent'] = oauth_group

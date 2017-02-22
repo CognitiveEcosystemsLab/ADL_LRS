@@ -120,18 +120,23 @@ def user_authorization(request, form_class=AuthorizeRequestTokenForm):
             if form.cleaned_data['authorize_access']:
                 request_token = store.authorize_request_token(
                     request, oauth_request, request_token)
-                args = {'oauth_token': request_token.key}
+		args = {'oauth_token': request_token.key, 'user': request.GET.get('clau',None)}
             else:
                 args = {'error': _('Access not granted by user.')}
 
             print 'callback url: %s' % (request_token.callback)
-            if request_token.callback is not None and request_token.callback != OUT_OF_BAND:
+	     	
+#            print 'new callback url: %s' % (request_token.callback)
+	    if request_token.callback is not None and request_token.callback != OUT_OF_BAND:
                 callback_url = request_token.get_callback_url(args)
-                if UNSAFE_REDIRECTS:
-                    response = UnsafeRedirect(callback_url)
+                #cla-user = request.GET.get('clau', None)
+		#print 'got CLA user: %s' % (cla-user) 
+		if UNSAFE_REDIRECTS:
+                    response = UnsafeRedirect(callback_url)#+'?user=%s' % cla-user)
                 else:
-                    response = HttpResponseRedirect(callback_url)
+                    response = HttpResponseRedirect(callback_url)#+'?user=%s' % cla-user)
             else:
+		print "We're in here..."
                 # try to get custom callback view
                 callback_view_str = getattr(settings, OAUTH_CALLBACK_VIEW,
                                             'oauth_provider.views.fake_callback_view')

@@ -6,6 +6,8 @@ from os.path import dirname, abspath
 SETTINGS_DIR = dirname(abspath(__file__))
 PROJECT_ROOT = dirname(dirname(SETTINGS_DIR))
 
+BASE_DIR = dirname(dirname(__file__))
+
 # If you want to debug
 DEBUG = True
 
@@ -23,11 +25,10 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'lrs',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '5432',
+      	'USER': '',
+	'NAME': '',
+	'HOST': 'localhost',
+	'PASSWORD': '',
     }
 }
 
@@ -179,7 +180,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            # insert your TEMPLATE_DIRS here
+            path.join(BASE_DIR, 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {

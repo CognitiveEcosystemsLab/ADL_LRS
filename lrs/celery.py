@@ -10,7 +10,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'adl_lrs.settings')
 from django.conf import settings
 
 app = Celery('lrs',
-             broker='amqp://lrs:clatoolkit_lrs@localhost:5672/lrsvhost',
+             broker='amqp://<rabbitmq_user>:<rabbitmq_pass>@localhost:5672/<vhost>',
              include=['lrs.tasks'])
 
 # Using a string here means the worker will not have to

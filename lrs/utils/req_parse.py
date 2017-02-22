@@ -141,6 +141,12 @@ def set_normal_authorization(request, r_dict):
 
 def parse_post_put_body(request, r_dict):
     # If there is no body, django test client won't send a content type
+    print 'PARSE_POST_PUT_BODY:'
+    print r_dict['headers']['CONTENT_TYPE']
+
+    print 'HEADERS:'
+    print r_dict['headers']
+
     if r_dict['headers']['CONTENT_TYPE']:
         # If it is multipart/mixed we're expecting attachment data (also for
         # signed statements)
